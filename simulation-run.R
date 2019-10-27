@@ -3,9 +3,9 @@
 ## Author: Thomas Alexander Gerds
 ## Created: Aug 17 2018 (11:53) 
 ## Version: 
-## Last-Updated: Oct 24 2019 (19:41) 
-##           By: Thomas Alexander Gerds
-##     Update #: 239
+## Last-Updated: okt 27 2019 (17:01) 
+##           By: Brice Ozenne
+##     Update #: 240
 #----------------------------------------------------------------------
 ## 
 ### Commentary: 
@@ -39,7 +39,6 @@
 #----------------------------------------------------------------------
 ## 
 ### Code:
-setwd("~/research/Methods/ATE/dropbox/simulation/")
 source("simulation-models.R")
 source("simulation-setting.R")
 source("simulation-functions.R")

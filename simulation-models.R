@@ -3,9 +3,9 @@
 ## Author: Thomas Alexander Gerds
 ## Created: Aug 16 2018 (08:51) 
 ## Version: 
-## Last-Updated: Mar 13 2019 (07:43) 
-##           By: Thomas Alexander Gerds
-##     Update #: 17
+## Last-Updated: okt 27 2019 (17:28) 
+##           By: Brice Ozenne
+##     Update #: 18
 #----------------------------------------------------------------------
 ## 
 ### Commentary: 
@@ -14,8 +14,33 @@
 #----------------------------------------------------------------------
 ## 
 ### Code:
-## Model 2: 
 library(lava)
+
+## * Setup
+setup.A <- c(BETA=0,
+             OMEGA=0,
+             GAMMA=0,
+             alpha=rep(c(0,-1,-1,0,1,-1),2) * log(2),
+             q.alpha=c(1,0,-1,0,1,-1) * log(2),
+             beta=rep(c(1,-1,0,0,1,-1),2) * log(2),
+             q.beta=c(1,-1,0,0,1,-1) * log(2),
+             omega=rep(c(0,0,1,-1,1,-1),2) * log(2),
+             q.omega=c(0,0,1,-1,1,-1) * log(2),
+             gamma=rep(0,12),
+             q.gamma=rep(0,12))
+setup.B <- c(BETA=-2,
+             OMEGA=0,
+             GAMMA=0,
+             alpha=rep(c(0,-1,-1,0,1,-1),2) * log(2),
+             q.alpha=c(1,0,-1,0,1,-1) * log(2),
+             beta=rep(c(1,-1,0,0,1,-1),2) * log(2),
+             q.beta=c(1,-1,0,0,1,-1) * log(2),
+             omega=rep(c(0,0,1,-1,1,-1),2) * log(2),
+             q.omega=c(0,0,1,-1,1,-1) * log(2),
+             gamma=rep(0,12),
+             q.gamma=rep(0,12))
+
+## * Model 
 model2 <- lvm()
 W <- paste("W",seq(12),sep="")
 q.vars <- paste0("W",1:6)

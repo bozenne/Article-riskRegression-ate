@@ -3,9 +3,9 @@
 ## Author: Thomas Alexander Gerds
 ## Created: Aug 16 2018 (08:47) 
 ## Version: 
-## Last-Updated: Oct 24 2019 (19:29) 
-##           By: Thomas Alexander Gerds
-##     Update #: 268
+## Last-Updated: okt 27 2019 (17:26) 
+##           By: Brice Ozenne
+##     Update #: 274
 #----------------------------------------------------------------------
 ## 
 ### Commentary: 
@@ -21,15 +21,14 @@ library(Publish)
 library(parallel)
 library(CausalGAM)
 library(riskRegression)
-## library(survtmle)
 library(survival)
 library(data.table)
-library(SuperLearner)
 
-plot.model2 <- function(parms,N,timeinterest){
-    distribution(model2,censtime) <- coxWeibull.lvm(scale=parms["scale.cr"])
+## * createFigure1
+createFigure1 <- function(model,parms,N,timeinterest){
+    distribution(model,censtime) <- coxWeibull.lvm(scale=parms["scale.cr"])
     ppp <- parms[!grepl("formula|scale",names(parms))]
-    dat <- as.data.table(lava::sim(model2,
+    dat <- as.data.table(lava::sim(model,
                                    n = N,
                                    p = ppp))
     cens.percent <- dat[,mean(time<timeinterest & event==0)]
@@ -51,7 +50,7 @@ plot.model2 <- function(parms,N,timeinterest){
     ## RCT: no effect on treatment assignment
     parms0 <- parms
     parms0[grepl("alpha",names(parms0))] <- 0
-    dat.RCT <- as.data.table(lava::sim(model2,n = N,p = parms0))
+    dat.RCT <- as.data.table(lava::sim(model,n = N,p = parms0))
     cens.percent.RCT <- dat.RCT[,mean(time<timeinterest & event==0)]
     E1.percent.RCT <- dat.RCT[,mean(time<timeinterest & event==1)]
     E2.percent.RCT <- dat.RCT[,mean(time<timeinterest & event==2)]
@@ -65,13 +64,14 @@ plot.model2 <- function(parms,N,timeinterest){
     cat(paste0(" Event 1 before timeinterest: ",round(100*E1.percent.RCT,1),"%\n"))
     cat(paste0(" Event 2 before timeinterest: ",round(100*E2.percent.RCT,1),"%\n"))
     cat(paste0("      Effect at timeinterest: ",round(100*diff(predictRisk(F.RCT,newdata=data.frame(A=0:1),times=timeinterest,cause=1)),1),"%\n"))
-    ### plot the curves
+### plot the curves
     plot(F,confint=FALSE,xlim=c(0,timeinterest),legend=FALSE,atrisk=FALSE,ylab="Absolute risk of cause 1",col=c("gray66","black"))
     plot(F.RCT,add=TRUE,lty=2,confint=FALSE,xlim=c(0,timeinterest),col=c("gray66","black"))
     legend(col=c("gray66","black"),bty="n",x="topleft",lwd=3,lty=c(1),legend=c("Untreated","Treated"),title="Non-randomized")
     legend(col=c("gray66","black"),bty="n",x="topright",lwd=3,lty=c(2),legend=c("Untreated","Treated"),title="Randomized")
 }
 
+## * rct.model2
 # approximate true ATE value based on large uncensored data set
 # where the treatment assigment is at random (alpha=0, q.alpha=0)
 rct.model2 <- function(parms,N,timeinterest){
@@ -85,6 +85,7 @@ rct.model2 <- function(parms,N,timeinterest){
     out
 }
 
+## * run.simulation
 ## simulate from model and apply alternative estimators
 run.simulation <- function(model,
                            setup,
@@ -212,6 +213,7 @@ run.simulation <- function(model,
     out
 }
 
+## * run.simulation1
 ## simulate from model and apply alternative estimators
 run.simulation1 <- function(model,
                             setup,
@@ -317,6 +319,7 @@ run.simulation1 <- function(model,
     out
 }
 
+## * table.simulation
 table.simulation <- function(x,true,digits=2,...){
     library(Publish)
     res <- do.call("rbind",lapply(x,function(X){
@@ -337,6 +340,7 @@ table.simulation <- function(x,true,digits=2,...){
     res
 }
 
+## * boxplot.simulation
 boxplot.simulation <- function(x,title,which=c("KM.naive","Gformula","IPWnaive","AIPWnaive","TMLE"),...){
     require(ggplot2)
     require(data.table)
