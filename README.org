@@ -1,7 +1,7 @@
 Article: On the estimation of average treatment effects with
 right-censored time to event outcome and competing risks
 
-Author: Brice Ozenne, Thomas Harder Scheike, Laila Staerk, Thomas Alexander Gerds.
+Authors: Brice Ozenne, Thomas Harder Scheike, Laila Staerk, Thomas Alexander Gerds.
 
 Author responsible for writing the code: Brice Ozenne, Thomas Alexander Gerds.
 
