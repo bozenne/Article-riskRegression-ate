@@ -1,3 +1,13 @@
+Article: On the estimation of average treatment effects with
+right-censored time to event outcome and competing risks
+
+Author: Brice Ozenne, Thomas Harder Scheike, Laila Staerk, Thomas Alexander Gerds.
+
+Author responsible for writing the code: Brice Ozenne, Thomas Alexander Gerds.
+
+E-mail of the author maintaining the code: tag@biostat.ku.dk
+
+* Content of the folder
 The file describes the infra structure of the empirical studies for
 the competing-risk-ATE manuscript. This infrastructure is composed of
 the following files/folders:
@@ -14,7 +24,7 @@ the following files/folders:
   figure 1, 2, and 3 of the article.
 - [[./Software]] package riskRegression used to run the simulations.
 
-* run R code
+* Run R code
 #+BEGIN_SRC R :exports both :results output :session *R* :cache no
 source("simulation-run.R")
 #+END_SRC
