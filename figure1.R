@@ -45,7 +45,7 @@ createFigure1 <- function(model, parms, N, timeinterest){
 }
 
 ## create figure
-pdf("figures/figure1-sim-setting.pdf", width = 10, height = 7)
+pdf("figures/figure1-simulation-setting.pdf", width = 10, height = 7)
 par(mfrow=c(1,2))
 set.seed(9)
 do.call("createFigure1",list(model = model2, parms = setup.A$parameters, N = 10000, timeinterest = 8))

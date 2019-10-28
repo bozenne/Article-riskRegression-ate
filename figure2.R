@@ -2,7 +2,7 @@ library(data.table)
 library(ggplot2)
 
 ## * Import results
-ls.dt.fig2 <- list(
+ls.dtW.fig2 <- list(
     "All models correct" = readRDS(file="./Results/figure2-All-models-correct.rds"),
     "Misspecified treatment model" = readRDS(file="./Results/figure2-Misspecified-treatment-model.rds"),
     "Misspecified outcome model" = readRDS(file="./Results/figure2-Misspecified-outcome-model.rds"),
@@ -16,18 +16,24 @@ vec.estimator <- c(
     "IPCW,IPTW" = "IPTW",
     "AIPCW,AIPTW" = "AIPTW"
 )
-vec.scenario <- names(ls.dt.fig2)
-keep.correlation <- "corr.1"
+vec.scenario <- names(ls.dtW.fig2)
 
-dt.fig2 <- do.call(rbind,lapply(vec.scenario, function(iScenario){ ## iScenario <- names(ls.dt.fig2)[1]
-    iDT.W <- as.data.table(ls.dt.fig2[[iScenario]][[keep.correlation]])
-    iDT.L <- melt(iDT.W, id=c("cens.percent","true.ate"),
-                 measure.vars = c("KM.naive","Gformula","IPTW","AIPTW"),
-                 value.name = "bias",
-                 variable.name = "estimator")
-    iDT.L[,scenario := iScenario]
+ls.dtL.fig2 <- lapply(vec.scenario, function(iScenario){ ## iScenario <- vec.scenario[1]
+    if(is.data.table(ls.dtW.fig2[[iScenario]]) || inherits(ls.dtW.fig2[[iScenario]],"sim")){
+        iDT.W <- as.data.table(ls.dtW.fig2[[iScenario]])
+    }else{
+        iDT.W <- as.data.table(ls.dtW.fig2[[iScenario]][["corr.1"]])        
+    }
+    if(is.null(iDT.W$scenario)){iDT.W$scenario <- as.character(iScenario)}
+    iDT.L <- melt(iDT.W, id=c("scenario"),
+                  measure.vars = c("KM.naive","Gformula","IPTW","AIPTW"),
+                  value.name = "bias",
+                  variable.name = "estimator")
+    if(!is.numeric(iDT.L$bias)){iDT.L$bias <- as.numeric(iDT.L$bias)}
+    iDT.L$scenario <- as.character(iDT.L$scenario)
     return(iDT.L)
-}))
+})
+dt.fig2 <- do.call(rbind,ls.dtL.fig2)
 dt.fig2[, estimator := factor(estimator, levels = vec.estimator, labels = names(vec.estimator))]
 dt.fig2[, scenario := factor(scenario, levels = unique(scenario))]
 

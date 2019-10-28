@@ -2,16 +2,16 @@ library(data.table)
 library(ggplot2)
 
 ## * Import results
-file.correct <- grep("^figure3-correct-N-",list.files("./Results"), value = TRUE)
-file.treatment <- grep("^figure3-mistreat-N-",list.files("./Results"), value = TRUE)
-file.outcome <- grep("^figure3-misout-N-",list.files("./Results"), value = TRUE)
-file.censoring <- grep("^figure3-miscens-N-",list.files("./Results"), value = TRUE)
+file.correct <- grep("^figure3-All-models-correct-",list.files("./Results"), value = TRUE)
+file.treatment <- grep("^figure3-Misspecified-treatment-model-",list.files("./Results"), value = TRUE)
+file.outcome <- grep("^figure3-Misspecified-outcome-model-",list.files("./Results"), value = TRUE)
+file.censoring <- grep("^figure3-Misspecified-censoring-model-",list.files("./Results"), value = TRUE)
 
 ls.dt.fig3 <- list()
 ls.dt.fig3$correct <- do.call(rbind,lapply(file.correct, function(iFile){ ## iFile <- file.correct[1]
     data.table(readRDS(file.path("./Results",iFile)), scenario = "All models correct")
 }))
-ls.dt.fig3$treatment <- do.call(rbind,lapply(file.treatment, function(iFile){ ## iFile <- file.treatment[1]
+ls.dt.fig3$treatment <- do.call(rbind,lapply(file.treatment, function(iFile){ ## iFile <- file.treatment[2]
     data.table(readRDS(file.path("./Results",iFile)), scenario = "Misspecified treatment model")
 }))
 ls.dt.fig3$outcome <- do.call(rbind,lapply(file.outcome, function(iFile){ ## iFile <- file.outcome[1]
@@ -38,7 +38,7 @@ dtL.fig3 <- melt(dtW.fig3[!is.na(KM.naive)], id.vars = c("N","scenario","true"),
                                      paste0("coverage.",vec.estimator)),
                  value.name = c("estimate","se","coverage"), variable.name = "estimator")
 dtL.fig3[, estimator := factor(estimator, levels = 1:length(vec.estimator), labels = names(vec.estimator))]
-dtL.fig3[, N := factor(N), ]
+dtL.fig3[, N := factor(N)]
 dtL.fig3[abs(estimate) > 1, c("estimate","se","coverage") := NA]
 dtL.fig3[ , scenario := factor(scenario, levels = unique(scenario))]
 setkeyv(dtL.fig3, c("scenario","estimator","N"))
@@ -62,5 +62,7 @@ figure3 <- figure3 + scale_color_manual(values = c("black","gray66"))
 figure3 <- figure3 + coord_cartesian(ylim = c(0.8,1))
 
 ## * Export figure
-ggsave(figure3, filename = "figures/figure3-simulation-coverage.pdf", width = 8, height = 7)
+pdf("figures/figure3-simulation-coverage.pdf")
+figure3
+dev.off()
 
