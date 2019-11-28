@@ -3,9 +3,9 @@
 ## Author: Thomas Alexander Gerds
 ## Created: Aug 16 2018 (08:47) 
 ## Version: 
-## Last-Updated: okt 28 2019 (13:15) 
+## Last-Updated: nov 27 2019 (14:10) 
 ##           By: Brice Ozenne
-##     Update #: 303
+##     Update #: 350
 #----------------------------------------------------------------------
 ## 
 ### Commentary: 
@@ -166,5 +166,61 @@ rct.model2 <- function(parms,N,timeinterest){
     out
 }
 
+## * simulate.data
+simulate.data <- function(){
+
+    ## group 1
+    m.dabigatran <- lvm()
+    distribution(m.dabigatran, ~male) <- binomial.lvm(p = 4507/7078, size = 1)
+    categorical(m.dabigatran, labels=c("<65","65-74","75-84",">85"), p = c(2697,3505,864,12)/7078) <- "age"
+    transform(m.dabigatran, age.num ~ age) <- function(x){
+        as.numeric(factor(x[,1], levels = c("<65","65-74","75-84",">85")))
+    }
+    transform(m.dabigatran, age.num2 ~ age) <- function(x){x^2}
+    distribution(m.dabigatran, ~heart.failure) <- binomial.lvm(p = 843/7078, size = 1)
+    distribution(m.dabigatran, ~hypertension) <- binomial.lvm(p = 2939/7078, size = 1)
+    distribution(m.dabigatran, ~diabetes)  <- binomial.lvm(p = 751/7078, size = 1)
+    distribution(m.dabigatran, ~prior.stroke) <- binomial.lvm(p = 833/7078, size = 1)
+    distribution(m.dabigatran, ~prior.bleeding) <- binomial.lvm(p = 583/7078, size = 1)
+
+    distribution(m.dabigatran, "eventtime1") <- lava::coxWeibull.lvm(scale = 1/2000, shape = 1.3)
+    distribution(m.dabigatran, "eventtime2") <- lava::coxWeibull.lvm(scale = 1/2000)
+    distribution(m.dabigatran, "censtime") <- lava::coxWeibull.lvm(scale = 1/5000)
+    m.dabigatran <- lava::eventTime(m.dabigatran, time ~ min(eventtime1 = 1, eventtime2 = 2, 
+                                                             censtime = 0), "event")
+    latent(m.dabigatran) <- ~eventtime1+eventtime2+censtime+age.num+age.num2
+    ## regression(m.dabigatran) <- eventtime1 ~ 1*prior.stroke+0.1*heart.failure+0.1*hypertension+0.1*diabetes+0.25*age.num+0.25*age.num2
+    ## regression(m.dabigatran) <- eventtime2 ~ 0.1*prior.stroke+0.5*heart.failure+0.2*hypertension+0.2*diabetes
+
+    ## group 2
+    m.rivaroxaban <- lvm()
+    distribution(m.rivaroxaban, ~male) <- binomial.lvm(p = 3807/6868, size = 1)
+    categorical(m.rivaroxaban, labels=c("<65","65-74","75-84",">85"), p = c(1567,2750,1898,653)/6868) <- "age"
+    transform(m.rivaroxaban, age.num ~ age) <- function(x){
+        as.numeric(factor(x[,1], levels = c("<65","65-74","75-84",">85")))-1
+    }
+    transform(m.rivaroxaban, age.num2 ~ age) <- function(x){x^2}
+    distribution(m.rivaroxaban, ~heart.failure) <- binomial.lvm(p = 821/6868, size = 1)
+    distribution(m.rivaroxaban, ~hypertension) <- binomial.lvm(p = 2989/6868, size = 1)
+    distribution(m.rivaroxaban, ~diabetes)  <- binomial.lvm(p = 774/6868, size = 1)
+    distribution(m.rivaroxaban, ~prior.stroke) <- binomial.lvm(p = 1025/6868, size = 1)
+    distribution(m.rivaroxaban, ~prior.bleeding) <- binomial.lvm(p = 656/6868, size = 1)
+
+    distribution(m.rivaroxaban, "eventtime1") <- lava::coxWeibull.lvm(scale = 1/3000, shape = 1.7)
+    distribution(m.rivaroxaban, "eventtime2") <- lava::coxWeibull.lvm(scale = 1/3000)
+    distribution(m.rivaroxaban, "censtime") <- lava::coxWeibull.lvm(scale = 1/5000)
+    m.rivaroxaban <- lava::eventTime(m.rivaroxaban, time ~ min(eventtime1 = 1, eventtime2 = 2, 
+                                                             censtime = 0), "event")
+    latent(m.rivaroxaban) <- ~eventtime1+eventtime2+censtime+age.num+age.num2
+    ## regression(m.rivaroxaban) <- eventtime1 ~ 1*prior.stroke+0.1*heart.failure+0.1*hypertension+0.1*diabetes+0.25*age.num+0.25*age.num2
+    ## regression(m.rivaroxaban) <- eventtime2 ~ 0.1*prior.stroke+0.5*heart.failure+0.2*hypertension+0.2*diabetes
+
+    ## simulate data
+    df <- rbind(cbind(lava::sim(m.dabigatran, n = 7078, latent = FALSE), treatment = "Dabigatran"),
+                cbind(lava::sim(m.rivaroxaban, n = 6868, latent = FALSE), treatment = "Rivaroxaban")
+                )
+
+    return(as.data.table(df)[])
+}
 ######################################################################
 ### simulation-functions.R ends here
