@@ -24,8 +24,8 @@ the following files/folders:
   figure 1, 2, and 3 of the article.
 - [[./Software]] package riskRegression used to run the simulations.
 
-Note: the file [[./figure4.R]] does not precisely replicates the figure 4
-of the article.  This is because we are not allowed to make the data
+Note: the file [[./figure4.R]] does not precisely replicate the figure 4
+of the article. This is because we are not allowed to make the data
 publicly available. Instead we used simulated data.
 
 * Run R code
